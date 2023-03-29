@@ -1,0 +1,131 @@
+{% extends 'backend/base.html' %}
+{% block title %} Product List {% endblock %}
+{% block content %}
+    <div class=" align-items-center justify-content-between mb-4 mt-5">
+        <a href="/" class="h3 mb-5 mt-5 text-decoration-none text-dark">Products</a>
+
+    </div>
+
+    <div class="card">
+        <form action="/find_product/" method="post" class="card-header" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row justify-content-between">
+                <div class="col-md-2">
+                    <input type="text" name="title" placeholder="Product Title" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <select name="variant" id="" class="form-control">
+                            <option class="bg-primary text-light" disabled>Color</option>
+                            {% for variant in color %}
+                                <option value="{{ variant }}"> {{ variant }}</option>
+                            {% endfor %}
+                            <option class="bg-primary text-light" disabled>Size</option>
+                                {% for variant in size %}
+                                    <option value="{{ variant }}"> {{ variant }}</option>
+                                {% endfor %}
+                            <option class="bg-primary text-light" disabled>Style</option>
+                                {% for variant in style %}
+                                    <option value="{{ variant }}"> {{ variant }}</option>
+                                {% endfor %}
+
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Price Range</span>
+                        </div>
+                        <input type="text" name="price_from" aria-label="First name" placeholder="From"
+                               class="form-control">
+                        <input type="text" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="date" placeholder="Date" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary float-end"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card-body row">
+            <div class="table-response">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="col-1">#</th>
+                        <th class="col-1">Title</th>
+                        <th class="col-4">Description</th>
+                        <th class="col-5">Variant</th>
+                        <th class="col-1" width="150px">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for key,value in records_all.items %}
+                        <tr>
+                            <td class="col-1">{{key}}</td>
+                            {% for inner_key,inner_value in value.items %}
+                                {% if inner_key == 1 %}
+                                    <td class="col-1">{{ inner_value.0 }}</td>
+                                    <td class="col-3">{{ inner_value.1 }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            <td class="col-6">
+                                <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                                    {% for inner_key,inner_value in value.items %}
+                                        {% if inner_key > 1 %}
+                                            <dt class="col-sm-3 pb-0">
+                                                {{ inner_value.0 }}/ {{ inner_value.1 }}/ {{ inner_value.2 }}
+                                            </dt>
+                                            <dd class="col-sm-9">
+                                                <dl class="row mb-0">
+                                                    <dd class="col-sm-4 pb-0">Price : {{ inner_value.3 }}</dd>
+                                                    <dd class="col-sm-8 pb-0">InStock : {{ inner_value.4 }}</dd>
+                                                </dl>
+                                            </dd>
+                                         {% endif %}
+                                    {% endfor %}
+                                </dl>
+                                <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more
+                                </button>
+                            </td>
+                            <td class="col-1">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="" class="btn btn-success">Edit</a>
+                                </div>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="row justify-content-between">
+                <div class="col-6">
+                    <p>Showing 1 to {{count}} out of {{count}}</p>
+                </div>
+                <div class="col-6 ">
+                    <span class="step-links float-end">
+                        {% if my_data.has_previous %}
+                            <a href="?page=1">&laquo; first</a>
+                            <a href="?page={{ my_data.previous_page_number }}">previous</a>
+                        {% endif %}
+
+                        <span class="current-page">
+                            Page {{ my_data.number }} of {{ my_data.paginator.num_pages }}.
+                        </span>
+                        {% if my_data.has_next %}
+                            <a href="?page={{ my_data.next_page_number }}">next</a>
+                            <a href="?page={{ my_data.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
